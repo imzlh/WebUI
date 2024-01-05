@@ -1,0 +1,109 @@
+@import '../public/icon.scss';
+
+@mixin w_tab(){
+    display: flex;
+    align-items: end;
+    background-color: #f2f0f0;
+    border-bottom: solid .1em rgb(229 216 216);
+
+    > .icon{
+        flex-shrink: 0;
+        margin: .35em .75em;
+        width: 1.2em;
+        height: 1.2em;
+    }
+
+    > .btn-create{
+        flex-shrink: 0;
+        padding: .35em .55em;
+        width: 1.2em;
+        height: 1.2em;
+        border-radius: .3em;
+        content: $icon_add;
+
+        &:hover{
+            background-color: rgb(229 216 216);
+        }
+    }
+
+    > .container{
+
+        display: flex;
+
+        > .tab{
+            border-radius: .3em .3em 0 0;
+            border: solid 0 rgb(229 216 216);
+            border-bottom: none;
+            color: rgb(95, 93, 93);
+            font-size: .85em;
+            font-weight: 300;
+            user-select: none;
+            padding: 0.5em 0.85em;
+            padding-right: 2.5em;
+            // line-height: 1.4em;
+            flex-grow: 1;
+            flex-shrink: 0; 
+            position: relative;
+            display: block;
+            text-decoration: none;
+
+            @at-root %_tab_btn{
+                // padding: .2em;
+                // margin: .2em;
+                // width: .6em;height: .6em;
+                // float: right;
+                position: absolute;
+                right: 0.65em;
+                top: 0.65em;
+                width: 1em;
+                height: 1em;
+            }
+
+            .btn-close{
+                @extend %_tab_btn;
+                // transform: scale(1.2);
+                display: none;
+
+                content: $icon_close;
+            }
+
+            &[data-no-close] .btn-close{
+                display: none !important;
+            }
+
+            &[data-title]::after{
+                content: attr(data-title);
+            }
+
+            &[data-motified=true] ::after{
+                @extend %_tab_btn;
+                transform: scale(0.8);
+                border-radius: .6em;
+                background-color: rgb(228, 220, 220);
+                display: block;
+
+                content: '';
+            }
+
+            &:hover{
+                background-color: rgb(233, 228, 228);
+
+                .btn-close{
+                    display: block;
+                }
+
+                &::after{
+                    display: none;
+                }
+            }
+
+            &[data-active=true]{
+                color: black;
+                background-color: white;
+                border-width: .1em;
+                font-weight: 500;
+                margin-bottom: -.1em;
+            }
+        }
+    }
+}

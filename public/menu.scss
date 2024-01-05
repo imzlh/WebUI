@@ -1,0 +1,62 @@
+
+// 标准的下拉菜单框
+// 可以用于右键菜单等
+@mixin ui_menu(
+    $offset_left:0,
+    $offset_top:2em,
+    $backdrop: #eeeaea92,
+    $hover: rgba(220, 206, 206, 0.5)
+) {
+    padding: .125em 0;
+    border-radius: .25em;
+    box-shadow: .05em .1em .35em rgb(164, 163, 163);
+    background-color: $backdrop;
+    backdrop-filter: blur(.5rem);
+
+    position: absolute;
+    left: $offset_left;
+    top: $offset_top;
+    z-index: 10;
+
+    --kbd-color: rgb(126, 118, 118);
+
+    >* {
+        padding: 0.375em;
+        font-weight: normal;
+        border-radius: 0.2em;
+        margin: 0.125em 0.25em;
+
+        display: flex;
+        align-items: center;
+
+        transition: all .2s;
+
+        >.icon {
+            width: 1.25em;
+            height: 1.25em;
+            margin: 0 .35em;
+            flex-shrink: 0;
+        }
+
+        >.text {
+            text-overflow: clip;
+            text-align: start;
+
+            flex-grow: 1;
+            line-height: 1.25em;
+            min-width: 8em;
+        }
+
+        .keyboard {
+            min-width: 5em;
+            font-size: .8em;
+            font-weight: 400;
+            color: var(--kbd-color);
+            overflow: hidden;
+        }
+
+        &:hover{
+            background-color: $hover;
+        }
+    }
+}

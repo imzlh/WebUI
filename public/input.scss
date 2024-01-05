@@ -1,0 +1,59 @@
+@mixin ui_input(
+    $border:.15em,
+    $padding:.5em
+){
+    --bg: #686666;
+    --border: rgb(44, 151, 190);
+
+    background-color: var(--bg);
+    border-radius: $padding;
+    border: solid $border #ffffff3c;
+    border-bottom-color: #ffffff63;
+    outline: none;
+
+    padding: $padding;
+    color: white;
+
+    &:focus{
+        border-bottom-color: var(--border);
+    }
+}
+
+@mixin ui_input-range(
+    $theme_color: #779ad1,
+    $switch_color: #fff
+){
+    display: block;
+    width: 100%;
+    height: .5em;
+    border-radius: 1em;
+    background-color: #c6c0c0;
+
+    &:hover >div::after{
+        display: block;
+        opacity: 1;
+    }
+
+    > div{
+        height: .5em;
+        border-radius: 1em;
+        position: relative;
+        background-color: $theme_color;
+
+        &::after{
+            content: '';
+            display: none;
+            opacity: 0;
+            width: 1.1em;
+            height: 1.1em;
+            border-radius: .6em;
+            background-color: $switch_color;
+
+            position: absolute;
+            right: -.3em;
+            top: -.3em;
+
+            transform: all .2s;
+        }
+    }
+}

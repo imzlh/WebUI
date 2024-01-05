@@ -1,0 +1,61 @@
+
+@import '../public/icon.scss';
+
+@mixin ui_card(
+    $base_color:rgb(225, 230, 241),
+    $head_color: rgb(200, 219, 234)
+){
+    $border: solid .1em rgb(213, 208, 208);
+
+    background-color: $base_color;
+    border: $border;
+    border-radius: .5em;
+    overflow: hidden;
+
+    > header{
+        border-bottom: $border;
+        justify-content: center;
+        display: flex;
+        padding: .5em .75em;
+        // position: relative;
+
+        .icon{
+            width: 1.4em;
+            height: 1.4em;
+            margin: 0 .5em 0 .4em;
+            flex-shrink: 0;
+        }
+
+        .title{
+            flex-grow: 1;
+            text-align: start;
+        }
+
+        .fold{
+            content: $icon_fold;
+            transition: all .2s;
+            @extend .icon;
+
+            // position: absolute;
+            // right: 0;
+            // top: 50%;
+            // transform: translateY(-50%);
+
+            &[data-open]{
+                transform: scale(180deg);
+            }
+        }
+    }
+
+    > .content{
+        overflow-y: auto;
+    }
+}
+
+@mixin ui_whitecard(){
+    
+}
+
+@mixin ui_alert{
+
+}

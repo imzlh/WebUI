@@ -1,0 +1,23 @@
+
+@import '../public/button.scss';
+@import '../public/menu.scss';
+
+// 实现一个支持下拉的菜单引导
+@mixin w_menu(){
+    display: flex;
+    $hover: #eee1e1;
+
+    > *{
+        @include ui_btn($hover);
+        position: relative;
+
+        &:focus .container{
+            display: block;
+        }
+
+        .container{
+            display: none;
+            @include ui_menu();
+        }
+    }
+}

@@ -1,0 +1,20 @@
+@mixin m_scrollbar() {
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        width: .4rem;
+        background-color: rgb(171, 165, 165);
+        border-radius: .5rem;
+
+        &:hover {
+            width: .8rem;
+            background-color: gray;
+        }
+    }
+
+    ::-webkit-scrollbar-track {
+        width: .8rem;
+    }
+}

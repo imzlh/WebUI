@@ -1,0 +1,102 @@
+@import '../public/icon.scss';
+
+@mixin w_window {
+    position: absolute;
+    min-width: 1rem;
+    min-height: 1rem;
+    background-color: #fff;
+    border-radius: 0.35rem;
+    box-shadow: 0 0 0.5rem #585454;
+    border-radius: .35rem;
+    overflow: hidden;
+    transition: all .2s;
+
+    &[data-size=max]{
+        width: 100% !important;
+        height: 100% !important;
+        left: 0 !important;
+        top: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    &[data-size=hidden]{
+        transform: scale(.5);
+        top: 100vh !important;
+        left: 0 !important;
+    }
+
+    >.action {
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 1000;
+        display: flex;
+
+        user-select: none;
+
+        >div {
+            padding: .45rem 1rem;
+            transition: background .2s;
+            --bg: #d4d3d3;
+
+            &.close{
+                --bg: #da4141;
+            }
+
+            width: .75rem;
+            height: .75rem;
+
+            &.close{
+                content: $icon_close;
+            }
+
+            &.min{
+                content: $icon_min;
+            }
+
+            &.resize{
+                content: $icon_mode-min;
+            }
+
+            &.resize[data-size=max]{
+                content: $icon_mode-max;
+            }
+
+            &:hover {
+                background-color: var(--bg);
+            }
+        }
+    }
+
+    >.body {
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        border: none;
+        outline: none;
+
+        .head {
+            display: flex;
+            height: 1rem;
+            padding: .35rem;
+            font-size: .8rem;
+            font-weight: 400;
+            padding-left: .5rem;
+            background-color: #f6f3f3;
+
+            user-select: none;
+
+            >img {
+                margin-right: .5rem;
+            }
+        }
+
+        .content {
+            width: 100%;
+            height: 100%;
+            display: block;
+            border: none;
+            outline: none;
+        }
+    }
+}
