@@ -12,8 +12,9 @@
             required: false,
             default: true 
         }, 'footer':{
-            type: String,
-            required: false
+            type: Boolean,
+            required: false,
+            defaults: false
         }, 'class':{
             type:String,
             required: false
@@ -33,7 +34,9 @@
         <div class="content" v-show="show_ctx">
             <slot></slot>
         </div>
-        <header v-if="prop.footer" v-html="prop.footer"></header>
+        <header v-if="prop.footer">
+            <slot name="after"></slot>
+        </header>
     </div>
 </template>
 

@@ -22,7 +22,8 @@
         x: parent.x + parent.width/2 - (meta.width || 200) ,
         y: parent.y + parent.height/2 - (meta.height || 120),
         width: (meta.width || 200),
-        height: (meta.height || 120)
+        height: (meta.height || 120),
+        display: 'normal'
     }
 </script>
 

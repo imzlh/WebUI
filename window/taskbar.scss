@@ -30,7 +30,12 @@
         position: absolute;
         left: 50%;
         bottom: 3rem;
-        transform: translateX(-50%);
+        transform: translate(-50%,120%);
+        transition: transform .2s;
+
+        &[data-active]{
+            transform: translateX(-50%);
+        }
     }
 
     > .widget{

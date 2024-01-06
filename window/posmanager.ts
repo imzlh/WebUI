@@ -12,7 +12,7 @@ function flush(element:HTMLElement){
     element.dataset.resized = action ? 'true' : 'false';
 }
 
-export default function listen(element:HTMLElement){
+export default function useAutoPosition(element:HTMLElement){
     console.debug('Auto-mark-position-element added.');
     list.push(element);
     flush(element);

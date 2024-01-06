@@ -29,38 +29,41 @@
 </template>
 <style lang="scss">
 
-    .calendar header{
-        padding: 1em 1.5em;
-    }
+    .calendar{
 
-    .calendar .content{
-        display: grid;
-        grid-template-columns: repeat(7,3em);
-        gap: .5em;
-        border: solid .1em transparent;
-        --main-color: rgb(75, 89, 186);
-        padding: 1em;
-        justify-content: center;
+        > header{
+            padding: 1em 1.5em;
+        }
 
-        cursor: auto;
+        > .content{
+            display: grid;
+            grid-template-columns: repeat(7,3em);
+            gap: .5em;
+            border: solid .1em transparent;
+            --main-color: rgb(75, 89, 186);
+            padding: 1em;
+            justify-content: center;
 
-        > div{
-            border-radius: 2em;
-            transition: all .2s;
-            width: 3em;
-            line-height: 3em;
+            cursor: auto;
 
-            &.im-date:hover{
-                background-color: rgb(215, 210, 210);
-            }
+            > div{
+                border-radius: 2em;
+                transition: all .2s;
+                width: 3em;
+                line-height: 3em;
 
-            &.im-date:focus{
-                border-color: var(--main-color);
-            }
+                &.im-date:hover{
+                    background-color: rgb(215, 210, 210);
+                }
 
-            &.active{
-                background-color: var(--main-color) !important;
-                color: white;
+                &.im-date:focus{
+                    border-color: var(--main-color);
+                }
+
+                &.active{
+                    background-color: var(--main-color) !important;
+                    color: white;
+                }
             }
         }
     }

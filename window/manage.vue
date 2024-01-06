@@ -1,12 +1,13 @@
 <script setup lang="ts">
-    import Vue,{ ref, defineProps, reactive, Raw } from 'vue';
+    import Vue,{ ref, defineProps, nextTick, Raw, watch } from 'vue';
     import Window from './window.vue';
     import Calendar from './calendar.vue';
     import listenPos from './posmanager';
     import { WindowPreset } from './window.vue';
-    import AudioPlayer from './player.vue';
+    import AudioPlayer, { AudioItem } from './player.vue';
+    import WindowsAction from './winlogo.vue';
 
-    const { window ,widget ,message } = defineProps({
+    const { window ,widget ,message, user } = defineProps({
         'window':{
             type: Object,
             default: []
@@ -16,11 +17,24 @@
         },'message':{
             type: Object,
             default: []
+        },'user':{
+            type: Object,
+            required: true
         }
     }) as {
             window: Array<WindowParam>,
             widget: Array<WidgetOpinion>,
-            message: Array<MessageOpinion>
+            message: Array<MessageOpinion>,
+            user: {
+                profile: {
+                    name: string,
+                    photo: string,
+                    uid: number
+                },app:{
+                    fixed:Array<AppItem>,
+                    recommend:Array<AppItem>
+                }
+            }
         },
         window_active = ref(0),
         dateref = ref(new Date()),
@@ -44,7 +58,6 @@
 
     // 单击小图标
     function callApp(app:WindowPreset,i:number){
-        console.log(i)
         if(i == window_active.value){
             // 已经激活: 最小化
             app.display = 'hidden';
@@ -56,6 +69,43 @@
             else window_active.value = -1;
         }
     }
+
+    // 消息组件
+    function postMessage(msg:MessageOpinion,window?:WindowParam){
+        if(window){
+            if(!msg.icon) msg.icon = window.icon;
+            if(!msg.title) msg.title = window.title;
+        }
+        const i = message.push(msg) -1;
+        if(msg.timeout) setTimeout(() => delete message[i],msg.timeout * 1000);
+    }
+    function msg_destroy(i:number){
+        message[i].hidden = true;
+        nextTick(() => setTimeout( () => delete message[i] , 200));
+    }
+
+    // 自动激活组件
+    const vActive = {
+        element:{},
+        beforeMount(element:HTMLElement,{value,modifiers}){
+            if(modifiers.target){
+                if(value in vActive.element)
+                    console.warn('重复的定义:',value);
+                vActive.element[value] = element;
+            }else{
+                element.onclick = () => widget_active.value = value;
+            }
+        }
+    }
+    watch(widget_active,(after,before) => {
+        console.log(before,after)
+        if(before && (before in vActive.element))
+            delete vActive.element[before].dataset.active;
+        if(!after) return;
+        if(after in vActive.element)
+            vActive.element[after].dataset.active = '';
+        else console.warn('找不到激活的组件:',after);
+    })
 
     export interface WindowParam extends WindowPreset {
         content: Vue.Component | Raw<Vue.Component>,
@@ -81,10 +131,22 @@
         },
         type?: 'warn'|'error'|'info'|'success',
         handle?: Function,
-        hidden?: boolean
+        hidden?: boolean,
+        timeout?: number
     }
 
-    defineExpose({audio});
+    export interface AppItem{
+        icon: string,
+        name: string,
+        package: string,
+        entry: string,
+        before?: (app:AppItem) => boolean|undefined
+    }
+
+    defineExpose({
+        audio,
+        message: postMessage
+    });
 
 </script>
 
@@ -97,28 +159,34 @@
         >
             <component :is="item.content" 
                 @destroy="() => {delete window[i]}" @top="window_active = i" @blur="window_active = 0;console.log(window_active)"
-                @message="msg => {
-                    if(!msg.icon) msg.icon = item.icon;
-                    if(!msg.title) msg.title = item.title;
-                    message.push(msg);
-                }"
+                @message="msg => postMessage(msg,item)"
+                @play="(item:AudioItem) => audio.play(item)"
             ></component>
         </Window>
     </template>
-    <div id="bar-mask" v-show="widget_active != ''" @click="widget_active = '';"></div>
+    <div id="bar-mask" v-show="widget_active != ''" v-active="''"></div>
 
     <!-- 任务栏 -->
     <div class="taskbar">
         <!-- 左侧小组件 -->
         <div class="widget icon" tabindex="-1">
-            <img src="./image/widget.png">
+            <img src="/image/widget.webp">
         </div>
         <!-- 中间组件 -->
         <div class="containter" tabindex="">
+            <!-- window标志 -->
+            <div class="icon" v-active="'default.winlogo'" >
+                <img src="/image/icon.webp">
+            </div>
+            <div class="dialog" v-active.target="'default.winlogo'">
+                <WindowsAction :recommend="user.app.recommend" :apps="[]" :profile="user.profile"
+                    @hide="widget_active = ''"
+                ></WindowsAction>
+            </div>
             <!-- 组件 -->
             <div v-for="item of widget" :class=" item.icon ? 'icon' : 'inline' " @click="item.handle">
                 {{ item.content }}
-                <div v-if="item.dialog" v-show="widget_active == item.id" class="dialog" v-auto-position>
+                <div v-if="item.dialog" v-active.target="item.id" class="dialog" v-auto-position>
                     {{ item.dialog }}
                 </div>
             </div>
@@ -135,22 +203,20 @@
         <!-- 右侧小组件 -->
         <div class="right">
             <div class="date" data-action="calendar" 
-                @click="widget_active = 'default.calendar'" 
+                v-active="'default.calendar'" 
                 style="background-color: transparent;"
             >
                 <!-- 时间组件 -->
                 <div>{{ _2(dateref.getHours()) }}:{{ _2(dateref.getMinutes()) }}:{{ _2(dateref.getSeconds()) }}</div>
                 <div>{{ _2(dateref.getFullYear()) }}/{{ _2(dateref.getMonth()) }}/{{ _2(dateref.getDay()) }}</div>
-                <div class="dialog"
-                    style="left: unset;right: 0;transform: none;background-color: transparent;width: 20rem;"
-                >
+                <div class="dialog messages">
                     <!-- 消息列表 -->
                     <template  v-for="(item,i) of message">
-                        <div v-if="item" class="message-card" @click.stop="">
+                        <div v-if="item" class="msg" :data-active="item.hidden ? null : ''" @click.stop>
                             <header v-if="item.title">
                                 <img v-if="item.icon" :src="item.icon">
                                 <span>{{ item.title }}</span>
-                                <i class="close" @click="delete message[i]"></i>
+                                <i class="close" @click="msg_destroy(i)"></i>
                             </header>
                             <template v-if="item.content">
                                 <div class="body" :data-level="item.type">
@@ -159,7 +225,7 @@
                                 </div>
                             </template>
                             <component v-else-if="item.body" 
-                                :is="item.body" v-show="item.hidden"
+                                :is="item.body"
                                 :title="item.title" :icon="item.icon"
                                 @click="item.handle" @destroy="delete message[i]"
                             ></component>
@@ -167,12 +233,10 @@
                     </template>
 
                     <!-- 内嵌音乐组件 -->
-                    <AudioPlayer ref="audio"></AudioPlayer>
+                    <AudioPlayer ref="audio" class="msg" data-active></AudioPlayer>
 
                     <!-- 日历 -->
-                    <div v-show="widget_active == 'default.calendar'">
-                        <Calendar></Calendar>
-                    </div>
+                    <Calendar v-active.target="'default.calendar'"></Calendar>
                 </div>
             </div>
         </div>
@@ -183,70 +247,88 @@
     @import './taskbar.scss';
     @import '../public/icon.scss';
 
-    .message-card{
-        background-color: rgba(219, 224, 236, .8);
-        backdrop-filter: blur(1em);
-        padding: 1.25em;
-        border-radius: .5em;
-        text-align: start;
-        margin: 1em 0;
+    .messages{
+        // overflow: hidden;
+        left: unset !important;
+        right: 0 !important;
+        transform: none !important;
+        background-color: transparent !important;
+        width: 20rem;
 
-        > header {
-            display: flex;
-            height: 1.5em;
-            gap: .75em;
-            line-height: 1.5em;
-            margin: -.25em;
-            color: #5c5e61;
+        .msg{
+            background-color: rgba(219, 224, 236, .8);
+            backdrop-filter: blur(1em);
+            padding: 1.25em;
+            border-radius: .5em;
+            text-align: start;
+            margin: 1em 0 !important;
 
-            .close{
-                content: $icon_right;
+            > header {
+                display: flex;
+                height: 1.5em;
+                gap: .75em;
+                line-height: 1.5em;
+                margin: -.25em;
+                color: #5c5e61;
+
+                .close{
+                    content: $icon_right;
+                }
+
+                span{
+                    flex-grow: 1;
+                }
+
+                *{
+                    flex-shrink: 0;
+                }
             }
 
-            span{
-                flex-grow: 1;
-            }
+            > .body{
+                &[data-level]{
+                    padding-left: 6em;
+                    position: relative;
 
-            *{
-                flex-shrink: 0;
+                    &::before{
+                        content: '';
+
+                        background-image: url('/image/question.webp');
+                        background-position: center;
+                        background-repeat: no-repeat;
+                        background-size: 100%;
+
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        bottom: 0;
+                        width: 5em;
+                    }
+
+                }
+                &[data-level=info]::before{
+                    background-image: url('/image/info.webp');
+                }
+
+                &[data-level=warn]::before{
+                    background-image: url('/image/warning.webp');
+                }
+
+                &[data-level=error]::before{
+                    background-image: url('/image/error.webp');
+                }
+
+                span{
+                    line-height: 1.5em;
+                }
             }
         }
 
-        > .body{
-            &[data-level]{
-                padding-left: 6em;
-                position: relative;
+        > div{
+            transition: all 0.2s;
 
-                &::before{
-                    content: '';
-
-                    background-image: url('/img/ui/question.png');
-                    background-position: center;
-                    background-repeat: no-repeat;
-                    background-size: 100%;
-
-                    position: absolute;
-                    left: 0;
-                    top: 0;
-                    bottom: 0;
-                    width: 5em;
-                }
-
-            }
-            &[data-level=info]::before{
-                background-image: url('./image/info.png');
-            }
-
-            &[data-level=warn]::before{
-                background-image: url('./image/warning.png');
-            }
-
-            &[data-level=error]::before{
-                background-image: url('./image/error.png');
-            }
-
-            span{
-                line-height: 1.5em;
+            &:not([data-active]){
+                transform: translateX(120%);
+                margin-bottom: -100%;
             }
         }
     }

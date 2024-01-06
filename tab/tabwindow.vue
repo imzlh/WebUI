@@ -6,7 +6,7 @@
         title: string,
         close: boolean,
         motified: boolean,
-        content: Ref<Vue.Component>
+        content?: Ref<Vue.Component>
     }
 
     const { icon,tabs } = defineProps(['tabs','icon']) as { tabs:Array<TabElement> ,icon:string },
@@ -35,14 +35,17 @@
                 active = tabs.push(tab) -1
             );"></div>
         </div>
-        <slot></slot>
+        <slot name="before"></slot>
         <div class="tab-container">
             <template  v-for="(tab,id) of tabs" :key="id">
-                <div v-if="tab" v-show="id == active">
-                    <component :is="tab.content" :data="tab"></component>
+                <div v-if="tab" v-show="id == active" v-bind="$attrs">
+                    <slot>
+                        <component :is="tab.content" :data="tab"></component>
+                    </slot>
                 </div>
             </template>
         </div>
+        <slot name="after"></slot>
     </div>
 </template>
 
@@ -66,9 +69,9 @@
 
         .tab-container{
             flex-grow: 1;
-            overflow: auto;
 
             > *{
+                overflow: auto;
                 width: 100%;
                 height: 100%;
             }

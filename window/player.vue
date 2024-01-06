@@ -4,7 +4,7 @@
     /**
      * 这是一个使用WebUI Card实现的音乐播放器
      */
-    interface AudioItem{
+    export interface AudioItem{
         src: string,
         cover: string,
         name?: string
@@ -25,7 +25,8 @@
     audio.ontimeupdate = () => now.played = audio.currentTime / audio.duration;
 
     function seekTime(ev:MouseEvent){
-        audio.currentTime = ev.clientX / (ev.currentTarget as HTMLElement).clientWidth * audio.duration;
+        audio.currentTime = ev.offsetX / (ev.currentTarget as HTMLElement).offsetWidth * audio.duration;
+        audio.play();
     }
 
     watch(() => now.id,function(){
@@ -53,7 +54,7 @@
 </script>
 
 <template>
-    <div class="message-card audio-player" @click.stop>
+    <div class="audio-player" @click.stop>
         <div class="left" :style="{
             backgroundImage: `url('${playlist[now.id]?.cover}')`
         }"></div>
@@ -95,12 +96,12 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-image: url('../icon.png');
+            background-image: url('/image/cd.webp');
         }
 
         > .right{
             flex-grow: 1;
-            padding: .75em 0 .75rem 1em;
+            padding-left: 1em;
 
             > span{
                 font-size: .9rem;
@@ -114,7 +115,7 @@
                 justify-content: center;
                 height: 2em;
                 gap: 3em;
-                margin: .75em 0;
+                margin: 1em 0;
 
                 .last{
                     content: $icon_back;

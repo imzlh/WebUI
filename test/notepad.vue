@@ -137,9 +137,11 @@
 </script>
 
 <template>
-    <TabWindow icon="./notepad.png" :tabs="tab" 
+    <TabWindow icon="/image/notepad.webp" :tabs="tab" style="overflow: hidden;"
         @change="c=>c()" @create="c=>c(createSession())" @close="closeHandle"
     >
-        <Menu :item="menu" />
+        <template #before>
+            <Menu :item="menu" />
+        </template>
     </TabWindow>
 </template>

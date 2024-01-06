@@ -1,6 +1,6 @@
 
 <script setup lang="ts">
-    import { Component, Ref, reactive } from 'vue';
+    import { Ref, reactive } from 'vue';
 
     // 传参
     export interface WindowPreset {
@@ -24,8 +24,7 @@
     }
 
     const {id ,preset ,active ,moveDiv }
-        = defineProps(['content','id','preset','active','moveDiv']) as {
-            content: Ref<Component>,
+        = defineProps(['id','preset','active','moveDiv']) as {
             id: string,
             preset: WindowPreset,
             active: Ref<boolean>,
@@ -103,6 +102,7 @@
     }
 
     console.debug('WebUI Window created.');
+    message('top');
 
 </script>
 
@@ -137,15 +137,14 @@
             top: preset.y + 'px',
             width: preset.width + 'px',
             height: preset.height + 'px',
-            zIndex: active ? 2 : 1,
+            zIndex: active ? 20 : 10,
             minWidth: '160px',
             minHeight: '90px',
             cursor: state.resize
         }" 
         :data-id="id" :class="'app-' + (preset.name || 'default') + ' window'" 
         :data-active="active" :data-size="preset.display"
-        @click="message('top');" 
-        @mousedown.prevent="handle" @mousemove.prevent="resizeCheck" @dblclick.prevent="chSize"
+        @mousedown.prevent="handle($event);message('top');" @mousemove.prevent="resizeCheck" @dblclick.prevent="chSize"
     >
         <div class="action">
             <div v-if="preset.btns" v-for="btn of preset.btns" 

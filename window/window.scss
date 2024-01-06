@@ -10,6 +10,7 @@
     border-radius: .35rem;
     overflow: hidden;
     transition: all .2s;
+    z-index: 500;
 
     &[data-size=max]{
         width: 100% !important;
@@ -84,7 +85,10 @@
             padding-left: .5rem;
             background-color: #f6f3f3;
 
+            position: sticky;
+            top: 0;
             user-select: none;
+            z-index: 100;
 
             >img {
                 margin-right: .5rem;
